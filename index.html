@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="uk"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f1115">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-180.png">
+<title>Облік змін</title>
+<style>
+:root{color-scheme:light;--bg:#f4f5f8;--card:#fff;--tx:#14161b;--mut:#6b7280;--line:#e6e8ee;--acc:#3b6cff;--acc2:#e8eeff;--ok:#16a34a;--warn:#d97706;--bad:#dc2626;--bar:#3b6cff;--bar2:#14b8a6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1115;--card:#181b22;--tx:#eef0f5;--mut:#9aa1b0;--line:#272b35;--acc:#6f93ff;--acc2:#1f2740;--ok:#4ade80;--warn:#fbbf24;--bad:#f87171;--bar:#6f93ff;--bar2:#2dd4bf;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1115;--card:#181b22;--tx:#eef0f5;--mut:#9aa1b0;--line:#272b35;--acc:#6f93ff;--acc2:#1f2740;--ok:#4ade80;--warn:#fbbf24;--bad:#f87171;--bar:#6f93ff;--bar2:#2dd4bf;color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif}
+#app{max-width:640px;margin:0 auto;padding-block:calc(14px + env(safe-area-inset-top,0px)) 96px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font-size:26px;margin:4px 0 14px;letter-spacing:-.02em}
+h2{font-size:15px;margin:22px 0 10px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.card{background:var(--card);border-radius:18px;padding:16px;border:1px solid var(--line);margin-bottom:12px}
+.hero{background:linear-gradient(135deg,#3b6cff,#6a4cf0);color:#fff;border:0}
+.hero .l{opacity:.85;font-size:13px}.hero .big{font-size:38px;font-weight:700;letter-spacing:-.03em;margin:2px 0 8px;font-variant-numeric:tabular-nums}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat .l{font-size:12px;color:var(--mut)}.stat .v{font-size:22px;font-weight:650;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.stat.wide{grid-column:span 2}
+.mut{color:var(--mut)}.sm{font-size:13px}
+.nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.nav b{font-size:17px;text-transform:capitalize}
+.ib{border:0;background:var(--card);color:var(--tx);width:40px;height:40px;border-radius:12px;font-size:20px;border:1px solid var(--line)}
+.btn{display:block;width:100%;border:0;border-radius:14px;padding:14px;font-size:16px;font-weight:600;background:var(--acc);color:#fff}
+.btn.sec{background:var(--acc2);color:var(--acc)}.btn.del{background:transparent;color:var(--bad)}
+.btn+.btn{margin-top:8px}
+.row{display:flex;gap:8px}.row>*{flex:1;min-width:0}
+label{display:block;font-size:13px;color:var(--mut);margin:12px 0 5px}
+input,select,textarea{display:block;box-sizing:border-box;width:100%;max-width:100%;min-width:0;height:50px;margin:0;font:inherit;line-height:1.2;text-align:left;color:var(--tx);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:0 12px;-webkit-appearance:none;appearance:none}
+input[type=date],input[type=time]{min-width:0;-webkit-min-logical-width:0}
+input::-webkit-date-and-time-value{text-align:left;min-height:1.2em}
+input::-webkit-datetime-edit{padding:0}
+select{padding-right:36px;background-image:linear-gradient(45deg,transparent 50%,var(--mut) 50%),linear-gradient(135deg,var(--mut) 50%,transparent 50%);background-position:calc(100% - 20px) 50%,calc(100% - 14px) 50%;background-size:6px 6px;background-repeat:no-repeat}
+textarea{height:auto;padding:12px}
+.tin{display:flex;align-items:center;justify-content:center;gap:2px;height:50px;padding:0 6px;background:var(--bg);border:1px solid var(--line);border-radius:12px}
+.tin:focus-within{border-color:var(--acc)}
+.tin input{flex:1;min-width:0;width:100%;height:100%;border:0;background:transparent;padding:0;text-align:center;font-size:20px;border-radius:0;font-variant-numeric:tabular-nums}
+.tin input:focus{outline:0}
+.tin span{color:var(--mut);font-size:20px}
+input[type=checkbox]{width:auto}
+.chk{display:flex;gap:8px;align-items:center;margin-top:12px;color:var(--tx);font-size:15px}
+.bar{height:10px;background:var(--line);border-radius:8px;overflow:hidden;margin:6px 0 4px}.bar i{display:block;height:100%;background:var(--ok);border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+th{text-align:left;color:var(--mut);font-weight:500;padding:6px 4px;border-bottom:1px solid var(--line)}
+td{padding:9px 4px;border-bottom:1px solid var(--line)}td.r,th.r{text-align:right}
+tr.c{cursor:pointer}
+.tabs{position:fixed;left:0;right:0;bottom:0;background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;justify-content:center;padding:0 max(16px,env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0px) max(16px,env(safe-area-inset-left,0px));z-index:5}
+.tabs div{display:flex;width:100%;max-width:640px}
+.tabs button{flex:1;border:0;background:none;color:var(--mut);padding:9px 0 8px;font-size:11px}
+.tabs button span{display:block;font-size:22px;line-height:1.1}.tabs button span svg{display:block;margin:0 auto 3px}.tw{overflow-x:auto}
+.tabs button.on{color:var(--acc)}
+.tabs button.plus span{background:var(--acc);color:#fff;width:46px;height:46px;border-radius:50%;margin:-18px auto 0;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 6px 16px rgba(59,108,255,.4)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal .h{font-size:11px;color:var(--mut);text-align:center;padding:2px 0}
+.cal .d{aspect-ratio:1/1.05;border-radius:10px;background:var(--bg);border:1px solid var(--line);font-size:12px;padding:4px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer}
+.cal .d.w{background:var(--acc2);border-color:var(--acc)}.cal .d.t{outline:2px solid var(--acc)}.cal .d.e{visibility:hidden}
+.cal .d b{font-size:11px;color:var(--acc);font-weight:600}
+.seg{display:flex;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:3px;margin-bottom:12px}
+.seg button{flex:1;border:0;background:none;color:var(--mut);padding:8px;border-radius:9px;font-size:14px}.seg button.on{background:var(--card);color:var(--tx);font-weight:600}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10;display:flex;align-items:flex-end;justify-content:center}
+.sheet>div{background:var(--bg);width:100%;max-width:640px;border-radius:22px 22px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom));max-height:86vh;overflow:auto}
+.li{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);gap:10px}
+.li:last-child{border:0}.li .t{font-variant-numeric:tabular-nums}
+.pill{font-size:12px;background:var(--acc2);color:var(--acc);padding:3px 9px;border-radius:20px}
+.toast{position:fixed;left:50%;bottom:calc(100px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;z-index:20}
+svg text{fill:var(--mut);font-size:9px}
+</style></head><body><div id="app"></div>
+<script>
+/*CORE*/
+const pad=n=>String(n).padStart(2,'0');
+const uid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);
+function parseT(t){const p=String(t).split(':').map(Number);return (p[0]||0)*3600+(p[1]||0)*60+(p[2]||0);}
+function normT(t){const p=String(t).split(':');return pad(+p[0]||0)+':'+pad(+p[1]||0)+':'+pad(+p[2]||0);}
+function shiftSec(s){let d=parseT(s.end)-parseT(s.start);if(d<=0)d+=86400;return d;}
+function roundDiv(n,d){return Math.floor((2*n+d)/(2*d));} // half-up, n>=0
+function ruleCost(r,S){const thr=r.thrH*3600;return r.base*Math.min(S,thr)+(r.base+r.raise)*Math.max(0,S-thr);}
+function monthOf(date){return date.slice(0,7);}
+function ruleFor(db,month){
+  if(db.rules[month])return db.rules[month];
+  const ks=Object.keys(db.rules).sort();let pick=null;
+  for(const k of ks){if(k<=month)pick=k;}
+  if(!pick)pick=ks[0];
+  return db.rules[pick]||{base:0,thrH:9999,raise:0,bonusH:0,bonus:0,recurring:false};
+}
+function calcMonth(db,month){
+  const r=ruleFor(db,month);
+  const list=db.shifts.filter(s=>monthOf(s.date)===month).sort((a,b)=>(a.date+a.start).localeCompare(b.date+b.start));
+  let cum=0,extraNum=0;const rows=[];
+  for(const s of list){
+    const sec=s.sec!=null?s.sec:shiftSec(s),before=cum;cum+=sec;
+    const x2=Math.min(s.x2||0,sec);
+    const num=ruleCost(r,cum)-ruleCost(r,before)+r.base*x2;extraNum+=r.base*x2;
+    rows.push({...s,sec,pay:roundDiv(num,3600)});
+  }
+  const sec=cum;
+  const realRows=rows.filter(r=>!r.opening),realSec=realRows.reduce((x,r)=>x+r.sec,0),realPay=realRows.reduce((x,r)=>x+r.pay,0);
+  const hoursPay=roundDiv(ruleCost(r,sec)+extraNum,3600);
+  const bh=r.bonusH*3600;
+  const n=bh>0?(r.recurring?Math.floor(sec/bh):(sec>=bh?1:0)):0;
+  const bonus=n*r.bonus;
+  const total=hoursPay+bonus;
+  const paid=db.payments.filter(p=>p.month===month).reduce((a,p)=>a+p.amount,0);
+  const thr=r.thrH*3600;
+  let toBonus=0;if(bh>0){toBonus=r.recurring?(Math.floor(sec/bh)+1)*bh-sec:Math.max(0,bh-sec);}
+  const days=new Set(realRows.map(s=>s.date)).size;
+  return {month,rule:r,rows,sec,hoursPay,bonus,bonusCount:n,total,paid,due:total-paid,toBonus,toRaise:Math.max(0,thr-sec),bonusDone:(!r.recurring&&sec>=bh),raiseDone:sec>=thr,days,count:realRows.length,realSec,realPay};
+}
+function fmtDur(sec){return Math.floor(sec/3600)+' год '+pad(Math.floor(sec%3600/60))+' хв '+pad(sec%60)+' с';}
+function fmtHM(sec){return Math.floor(sec/3600)+':'+pad(Math.floor(sec%3600/60));}
+function fmtMoney(k){const neg=k<0;k=Math.abs(k);const g=Math.floor(k/100),c=k%100;return (neg?'−':'')+String(g).replace(/\B(?=(\d{3})+(?!\d))/g,' ')+','+pad(c)+' ₴';}
+function overlaps(db,cand,ignoreId){
+  const ep=(date,t)=>Date.UTC(+date.slice(0,4),+date.slice(5,7)-1,+date.slice(8,10))/1000+parseT(t);
+  const iv=s=>{const a=ep(s.date,s.start);let b=ep(s.date,s.end);if(b<=a)b+=86400;return [a,b];};
+  const [a,b]=iv(cand);
+  return db.shifts.find(s=>s.id!==ignoreId&&!s.opening&&(()=>{const [c,d]=iv(s);return a<d&&c<b;})());
+}
+function emptyDb(){return {v:1,onboarded:false,rules:{},shifts:[],payments:[]};}
+/*ENDCORE*/
+
+/* ---------- storage + sync ---------- */
+const KEY='worktime_db_v1';
+let db=null,syncState='local',remoteDoc=null,wTimer=null,wBusy=false,wDirty=false;
+function localSave(){try{localStorage.setItem(KEY,JSON.stringify(db));}catch(e){}}
+function readLocal(){try{const r=localStorage.getItem(KEY);if(r){const d=JSON.parse(r);if(d&&d.shifts&&d.payments&&d.rules)return d;}}catch(e){}return null;}
+function save(){db.savedAt=Date.now();localSave();queuePush();}
+function queuePush(){if(!remoteDoc)return;wDirty=true;clearTimeout(wTimer);wTimer=setTimeout(push,400);}
+async function push(){
+  if(wBusy){wTimer=setTimeout(push,400);return;}
+  if(!wDirty||!remoteDoc)return;
+  wBusy=true;wDirty=false;
+  try{await remoteDoc.set({payload:JSON.stringify(db),savedAt:db.savedAt});syncState='ok';}
+  catch(e){syncState='err';wDirty=true;setTimeout(push,15000);}
+  wBusy=false;if(S.tab==='set')render();
+}
+async function initSync(){
+  try{
+    if(!window.claude||!window.claude.use)throw 0;
+    const [d,u]=await Promise.all([claude.use('db'),claude.use('user')]);
+    const uid=u&&await u.id();
+    if(!d||!uid)throw 0;
+    remoteDoc=d.doc('data/users/'+uid+'/state');syncState='wait';
+    const t=setTimeout(()=>{if(!db){S.loadNote='Сховище довго не відповідає…';render();}},10000);
+    remoteDoc.onSnapshot(snap=>{
+      clearTimeout(t);
+      if(snap.exists){
+        const r=snap.data()||{};
+        if(!db||(r.savedAt||0)>(db.savedAt||0)){
+          try{const d2=JSON.parse(r.payload);if(d2&&d2.shifts){db=d2;db.savedAt=r.savedAt;localSave();}}catch(e){}
+        }else if((db.savedAt||0)>(r.savedAt||0)){queuePush();}
+        syncState='ok';
+      }else if(!snap.metadata.fromCache){
+        if(!db)db=emptyDb();
+        save();syncState='ok';
+      }
+      if(db&&S.tab!=='add')render();
+    },e=>{syncState='err';if(!db){db=emptyDb();localSave();}render();});
+  }catch(e){
+    syncState='local';if(!db){db=emptyDb();localSave();}render();
+  }
+}
+db=readLocal();
+
+/* ---------- state ---------- */
+const MN=['січень','лютий','березень','квітень','травень','червень','липень','серпень','вересень','жовтень','листопад','грудень'];
+const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());};
+const nowT=()=>{const d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());};
+let S={tab:'home',month:todayStr().slice(0,7),cal:'grid',edit:null,sheet:null,form:null};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const mLabel=m=>MN[+m.slice(5)-1]+' '+m.slice(0,4);
+const shiftM=(m,d)=>{let y=+m.slice(0,4),n=+m.slice(5)-1+d;y+=Math.floor(n/12);n=((n%12)+12)%12;return y+'-'+pad(n+1);};
+function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),2200);}
+const grn=k=>(k/100).toFixed(2).replace('.',',');
+const parseMoney=s=>Math.round(parseFloat(String(s).replace(/\s/g,'').replace(',','.'))*100);
+function allMonths(){const s=new Set([todayStr().slice(0,7)]);db.shifts.forEach(x=>s.add(monthOf(x.date)));db.payments.forEach(p=>s.add(p.month));return [...s].sort();}
+
+/* ---------- ui helpers ---------- */
+function monthNav(){return `<div class="nav"><button class="ib" onclick="gm(-1)">‹</button><b>${mLabel(S.month)}</b><button class="ib" onclick="gm(1)">›</button></div>`;}
+function gm(d){S.month=shiftM(S.month,d);render();}
+function go(t){S.tab=t;S.sheet=null;render();scrollTo(0,0);}
+function bars(vals,labels,color,fmt){
+  const W=340,H=130,max=Math.max(...vals,1),bw=W/vals.length;
+  let o=`<svg viewBox="0 0 ${W} ${H+16}" width="100%" role="img">`;
+  vals.forEach((v,i)=>{const h=v/max*H;o+=`<rect x="${i*bw+1}" y="${H-h}" width="${Math.max(bw-2,1)}" height="${h}" rx="2" fill="${color}" opacity="${v?1:.15}"/>`;
+    if(labels[i]!==''&&(vals.length<=12||i%3===0||i===vals.length-1))o+=`<text x="${i*bw+bw/2}" y="${H+11}" text-anchor="middle">${labels[i]}</text>`;});
+  return o+'</svg>';
+}
+function dayArrays(c,key){
+  const [y,m]=c.month.split('-').map(Number),n=new Date(y,m,0).getDate();const a=Array(n).fill(0);
+  c.rows.forEach(r=>{if(r.opening)return;a[+r.date.slice(8)-1]+=key==='pay'?r.pay:r.sec;});return a;
+}
+
+/* ---------- screens ---------- */
+function vHome(){
+  const c=calcMonth(db,S.month),r=c.rule;const showB=r.bonusH>0&&r.bonus>0,showR=r.raise>0;
+  const bp=c.bonusDone?100:Math.min(100,c.sec/(r.bonusH*3600)*100);
+  const rp=Math.min(100,c.sec/(r.thrH*3600)*100);
+  const last=[...c.rows].reverse().slice(0,5);
+  return `<h1>Головна</h1>${vInstall()}${vLive()}${monthNav()}
+  <div class="card hero"><div class="l">Нараховано за ${mLabel(S.month)}</div><div class="big">${fmtMoney(c.total)}</div>
+   <div class="l">Залишок до виплати: <b>${fmtMoney(c.due)}</b></div></div>
+  <div class="grid">
+   <div class="card stat"><div class="l">Відпрацьовано</div><div class="v">${fmtDur(c.sec)}</div></div>
+   <div class="card stat"><div class="l">За години</div><div class="v">${fmtMoney(c.hoursPay)}</div></div>
+   <div class="card stat"><div class="l">Премії</div><div class="v">${fmtMoney(c.bonus)}</div></div>
+   <div class="card stat"><div class="l">Отримано на картку</div><div class="v">${fmtMoney(c.paid)}</div></div>
+  </div>
+${showB?`  <div class="card"><div class="row" style="align-items:baseline"><b>До премії</b><span class="mut sm" style="text-align:right">${c.bonusDone?'отримано ✓':fmtDur(c.toBonus)}</span></div>
+   <div class="bar"><i style="width:${bp}%"></i></div><div class="mut sm">Поріг ${r.bonusH} год · ${fmtMoney(r.bonus)}${r.recurring?' (повторювана)':''}</div></div>
+`:''}${showR?`  <div class="card"><div class="row" style="align-items:baseline"><b>До підвищення ставки</b><span class="mut sm" style="text-align:right">${c.raiseDone?'діє ✓':fmtDur(c.toRaise)}</span></div>
+   <div class="bar"><i style="width:${rp}%;background:var(--bar)"></i></div><div class="mut sm">Після ${r.thrH} год · ${fmtMoney(r.base+r.raise)}/год (зараз ${fmtMoney(r.base)})</div></div>
+`:''}
+  <button class="btn sec" onclick="openAdd()">+ Додати зміну вручну</button>
+  <h2>Останні зміни</h2><div class="card">${last.length?last.map(x=>`<div class="li" onclick="openEdit('${x.id}')"><div><div>${x.date.slice(8)}.${x.date.slice(5,7)} · ${fmtHM(x.sec)}</div><div class="mut sm">${x.opening?'було до обліку':x.start.slice(0,5)+'–'+x.end.slice(0,5)}${x.note?' · '+esc(x.note):''}</div></div><div class="t">${fmtMoney(x.pay)}</div></div>`).join(''):'<div class="mut">Змін ще немає</div>'}</div>`;
+}
+function vCal(){
+  const c=calcMonth(db,S.month),[y,m]=S.month.split(':')[0].split('-').map(Number);
+  const first=(new Date(y,m-1,1).getDay()+6)%7,n=new Date(y,m,0).getDate(),t=todayStr();
+  const by={};c.rows.forEach(r=>{if(r.opening)return;(by[r.date]=by[r.date]||[]).push(r);});
+  let g='<div class="cal">'+['Пн','Вт','Ср','Чт','Пт','Сб','Нд'].map(d=>`<div class="h">${d}</div>`).join('');
+  for(let i=0;i<first;i++)g+='<div class="d e"></div>';
+  for(let d=1;d<=n;d++){const ds=S.month+'-'+pad(d),sh=by[ds];const sec=sh?sh.reduce((a,x)=>a+x.sec,0):0;
+    g+=`<div class="d ${sh?'w':''} ${ds===t?'t':''}" onclick="dayTap('${ds}')"><span>${d}</span>${sh?`<b>${fmtHM(sec)}</b>`:''}</div>`;}
+  g+='</div>';
+  let tb=`<div class="card tw" style="padding:8px 10px"><table><tr><th>Дата</th><th>Час</th><th class="r">Трив.</th><th class="r">₴</th></tr>${c.rows.map(x=>`<tr class="c" onclick="openEdit('${x.id}')"><td>${x.date.slice(8)}.${x.date.slice(5,7)}</td><td>${x.opening?'було до обліку':x.start.slice(0,8)+'–'+x.end.slice(0,8)}</td><td class="r">${fmtHM(x.sec)}</td><td class="r">${fmtMoney(x.pay).replace(' ₴','')}</td></tr>`).join('')||'<tr><td colspan=4 class="mut">Немає змін</td></tr>'}<tr><td colspan=2><b>Разом</b></td><td class="r"><b>${fmtHM(c.sec)}</b></td><td class="r"><b>${fmtMoney(c.hoursPay).replace(' ₴','')}</b></td></tr></table></div>`;
+  return `<h1>Календар</h1>${monthNav()}<div class="seg"><button class="${S.cal==='grid'?'on':''}" onclick="S.cal='grid';render()">Календар</button><button class="${S.cal==='table'?'on':''}" onclick="S.cal='table';render()">Таблиця</button></div>
+  ${S.cal==='grid'?`<div class="card">${g}</div>`:tb}`;
+}
+function dayTap(ds){
+  const list=db.shifts.filter(s=>s.date===ds);
+  if(!list.length){openAdd(ds);return;}
+  const c=calcMonth(db,monthOf(ds)),rows=c.rows.filter(r=>r.date===ds);
+  S.sheet=`<h2 style="margin-top:0">${ds.slice(8)}.${ds.slice(5,7)}.${ds.slice(0,4)}</h2>${rows.map(x=>`<div class="li" onclick="openEdit('${x.id}')"><div><div>${x.opening?'Було до обліку':x.start+'–'+x.end}</div><div class="mut sm">${fmtDur(x.sec)}${x.note?' · '+esc(x.note):''}</div></div><div class="t">${fmtMoney(x.pay)}</div></div>`).join('')}<button class="btn sec" style="margin-top:10px" onclick="openAdd('${ds}')">+ Ще зміна цього дня</button><button class="btn del" onclick="closeSheet()">Закрити</button>`;
+  render();
+}
+function closeSheet(){S.sheet=null;render();}
+let _cb=null;
+function ask(text,yes,onYes){_cb=onYes;S.sheet=`<div style="font-size:17px;margin-bottom:14px">${text}</div><button class="btn" onclick="askYes()">${yes}</button><button class="btn sec" onclick="closeSheet()">Скасувати</button>`;render();}
+function askYes(){const f=_cb;_cb=null;S.sheet=null;render();if(f)f();}
+function openAdd(ds){S.edit=null;S.form={date:ds||todayStr(),start:'',end:'',note:'',x2:0};S.sheet=null;S.tab='add';render();scrollTo(0,0);}
+function openEdit(id){const s=db.shifts.find(x=>x.id===id);
+  if(s.opening){S.edit=id;S.sheet=`<div style="font-size:17px;margin-bottom:6px">Відпрацьовано до початку обліку</div><div class="mut" style="margin-bottom:14px">${fmtDur(s.sec)}</div><button class="btn del" onclick="delShift()">Видалити запис</button><button class="btn sec" onclick="closeSheet()">Закрити</button>`;render();return;}
+  S.edit=id;S.form={...s};S.sheet=null;S.tab='add';render();scrollTo(0,0);}
+function vAdd(){
+  const f=S.form||(S.form={date:todayStr(),start:'',end:'',note:'',x2:0});
+  const sec=f.start&&f.end?shiftSec(f):0;
+  return `<h1>${S.edit?'Редагувати зміну':'Додати зміну'}</h1>
+  <div class="card"><label>Дата</label><input type="date" id="f_date" value="${f.date}">
+  <div class="row"><div><label>Початок</label>${tinHtml('f_start',f.start)}</div><div><label>Кінець</label>${tinHtml('f_end',f.end)}</div></div>
+  <div class="row" style="margin-top:8px"><button class="btn sec" onclick="setNow('f_start')">Початок — зараз</button><button class="btn sec" style="margin-top:0" onclick="setNow('f_end')">Кінець — зараз</button></div>
+  <label>Примітка (необов’язково)</label><input id="f_note" value="${esc(f.note)}" placeholder="…">
+  <label>Години з оплатою ×2 (необов’язково, ГГ:ХХ)</label><input id="f_x2" value="${f.x2?fmtHM(f.x2):''}" placeholder="0:00 — немає" inputmode="numeric">
+  </div>
+  <button class="btn" onclick="saveShift()">Зберегти</button>
+  ${S.edit?`<button class="btn del" onclick="delShift()">Видалити зміну</button>`:''}
+  <button class="btn sec" onclick="go('home')">Скасувати</button>`;
+}
+/* ---------- time input HH MM SS ---------- */
+function tinHtml(id,val){
+  const p=(val||'').split(':');
+  const b=(k,i)=>`<input inputmode="numeric" pattern="[0-9]*" maxlength="2" autocomplete="off" enterkeyhint="next" placeholder="00" aria-label="${k}" data-i="${i}" value="${p[i]||''}">`;
+  return `<div class="tin" id="${id}">${b('години',0)}<span>:</span>${b('хвилини',1)}<span>:</span>${b('секунди',2)}</div>`;
+}
+function getT(id){
+  const v=[...document.querySelectorAll('#'+id+' input')].map(i=>i.value);
+  if(!v.some(x=>x!==''))return '';
+  return v.map(x=>pad(+x||0)).join(':');
+}
+function setT(id,val){const p=val.split(':');document.querySelectorAll('#'+id+' input').forEach((i,k)=>{i.value=p[k]||'00';});}
+function tinMove(el,d){
+  const l=[...document.querySelectorAll('.tin input')],n=l[l.indexOf(el)+d];
+  if(n){n.focus();}else if(d>0){el.blur();}
+}
+document.addEventListener('input',e=>{
+  const el=e.target;if(!(el.closest&&el.closest('.tin')))return;
+  const h=el.dataset.i==='0';
+  let v=el.value.replace(/\D/g,'');
+  if(v.length===1&&+v>(h?2:5))v='0'+v;
+  if(v.length>=2){v=v.slice(0,2);if(+v>(h?23:59))v=String(h?23:59);}
+  el.value=v;
+  if(v.length===2)tinMove(el,1);
+});
+document.addEventListener('keydown',e=>{
+  const el=e.target;if(!(el.closest&&el.closest('.tin')))return;
+  if(e.key==='Backspace'&&el.value===''){e.preventDefault();tinMove(el,-1);return;}
+  if([':','.',',',' ','-'].includes(e.key)){e.preventDefault();if(el.value.length===1)el.value='0'+el.value;tinMove(el,1);}
+});
+document.addEventListener('paste',e=>{
+  const c=e.target.closest&&e.target.closest('.tin');if(!c)return;
+  e.preventDefault();
+  const d=(e.clipboardData.getData('text')||'').replace(/\D/g,'').slice(0,6).padEnd(6,'0');
+  const l=[...c.querySelectorAll('input')];
+  l.forEach((i,k)=>{let x=+d.slice(k*2,k*2+2);i.value=pad(Math.min(x,k?59:23));});
+  l[2].focus();
+});
+document.addEventListener('focusin',e=>{const el=e.target;if(!(el.closest&&el.closest('.tin')))return;const v0=el.value;if(v0==='')return;try{el.select();}catch(_){}setTimeout(()=>{if(document.activeElement===el&&el.value===v0){try{el.select();}catch(_){}}},0);});
+
+function setNow(id){setT(id,nowT());}
+function readForm(){return {date:f_date.value,start:getT('f_start'),end:getT('f_end'),note:f_note.value.trim(),x2:f_x2.value.trim()?parseT(f_x2.value.trim().includes(':')?f_x2.value.trim():f_x2.value.trim()+':00'):0};}
+function saveShift(){
+  const f=readForm();S.form=f;
+  if(!f.date||!f.start||!f.end)return toast('Вкажіть дату, початок і кінець');
+  if(f.start===f.end)return toast('Початок і кінець однакові');
+  const dup=overlaps(db,f,S.edit);
+  if(dup){ask(`Ця зміна перетинається з наявною (${dup.date.slice(8)}.${dup.date.slice(5,7)} ${dup.start}–${dup.end}). Все одно зберегти?`,'Зберегти все одно',()=>commitShift(f));return;}
+  commitShift(f);
+}
+function commitShift(f){
+  const m=monthOf(f.date);
+  if(!db.rules[m])db.rules[m]={...ruleFor(db,m)};
+  if(S.edit){Object.assign(db.shifts.find(x=>x.id===S.edit),f);}else db.shifts.push({id:uid(),...f});
+  save();S.edit=null;S.form=null;S.month=m;toast('Збережено');go('home');
+}
+function delShift(){ask('Видалити цю зміну?','Видалити',()=>{db.shifts=db.shifts.filter(x=>x.id!==S.edit);save();S.edit=null;S.form=null;toast('Видалено');go('cal');});}
+
+function vPay(){
+  const c=calcMonth(db,S.month),ps=db.payments.filter(p=>p.month===S.month).sort((a,b)=>b.date.localeCompare(a.date));
+  const debt=allMonths().reduce((a,m)=>a+calcMonth(db,m).due,0);
+  return `<h1>Виплати</h1>${monthNav()}
+  <div class="card"><div class="grid"><div class="stat"><div class="l">Нараховано</div><div class="v">${fmtMoney(c.total)}</div></div><div class="stat"><div class="l">Отримано</div><div class="v">${fmtMoney(c.paid)}</div></div><div class="stat wide"><div class="l">Залишок до виплати</div><div class="v" style="color:${c.due>0?'var(--warn)':'var(--ok)'}">${fmtMoney(c.due)}</div></div></div></div>
+  <div class="card"><b>Додати виплату</b><label>Дата</label><input type="date" id="p_date" value="${todayStr()}">
+   <label>Сума, грн</label><input id="p_sum" inputmode="decimal" placeholder="10000">
+   <label>За місяць</label><select id="p_m">${allMonths().map(m=>`<option value="${m}" ${m===S.month?'selected':''}>${mLabel(m)}</option>`).join('')}</select>
+   <label>Примітка</label><input id="p_note"><div style="height:12px"></div><button class="btn" onclick="addPay()">Додати</button></div>
+  <h2>Історія виплат</h2><div class="card">${ps.map(p=>`<div class="li"><div><div>${p.date.slice(8)}.${p.date.slice(5,7)}.${p.date.slice(0,4)}</div><div class="mut sm">${esc(p.note)}</div></div><div style="text-align:right"><div class="t">${fmtMoney(p.amount)}</div><button class="pill" style="border:0" onclick="delPay('${p.id}')">видалити</button></div></div>`).join('')||'<div class="mut">Виплат немає</div>'}</div>
+  <div class="mut sm">Загальний залишок за всі місяці: <b>${fmtMoney(debt)}</b></div>`;
+}
+function addPay(){const a=parseMoney(p_sum.value);if(!(a>0))return toast('Вкажіть суму');db.payments.push({id:uid(),date:p_date.value,month:p_m.value,amount:a,note:p_note.value.trim()});save();toast('Виплату додано');render();}
+function delPay(id){ask('Видалити виплату?','Видалити',()=>{db.payments=db.payments.filter(p=>p.id!==id);save();render();});}
+
+function vStats(){
+  const c=calcMonth(db,S.month),ms=allMonths().slice(-6).map(m=>calcMonth(db,m));
+  const labels=Array.from({length:dayArrays(c,'pay').length},(_,i)=>i+1);
+  return `<h1>Статистика</h1>${monthNav()}
+  <div class="grid"><div class="card stat"><div class="l">Середня зміна</div><div class="v">${c.count?fmtHM(Math.round(c.realSec/c.count)):'—'}</div></div><div class="card stat"><div class="l">Середній заробіток/день</div><div class="v">${c.days?fmtMoney(Math.round(c.realPay/c.days)):'—'}</div></div><div class="card stat"><div class="l">Змін</div><div class="v">${c.count}</div></div><div class="card stat"><div class="l">Годин/день (роб.)</div><div class="v">${c.days?fmtHM(Math.round(c.realSec/c.days)):'—'}</div></div></div>
+  <h2>Заробіток за днями</h2><div class="card">${bars(dayArrays(c,'pay'),labels,'var(--bar)')}</div>
+  <h2>Години за днями</h2><div class="card">${bars(dayArrays(c,'sec'),labels,'var(--bar2)')}</div>
+  <h2>Порівняння місяців (нараховано)</h2><div class="card">${bars(ms.map(x=>x.total),ms.map(x=>MN[+x.month.slice(5)-1].slice(0,3)),'var(--bar)')}<div class="mut sm">${ms.map(x=>MN[+x.month.slice(5)-1].slice(0,3)+': '+fmtMoney(x.total)).join(' · ')}</div></div>
+  <h2>Експорт</h2><button class="btn sec" onclick="exportCsv(false)">CSV (Excel) — цей місяць</button><button class="btn sec" onclick="exportCsv(true)">CSV (Excel) — усі місяці</button>`;
+}
+function vHist(){
+  return `<h1>Історія місяців</h1>`+allMonths().reverse().map(m=>{const c=calcMonth(db,m);return `<div class="card" onclick="S.month='${m}';go('home')"><div class="row" style="align-items:baseline"><b style="text-transform:capitalize">${mLabel(m)}</b><span class="mut sm" style="text-align:right">${fmtDur(c.sec)}</span></div>
+  <div class="grid" style="margin-top:8px"><div class="stat"><div class="l">Нараховано</div><div class="v" style="font-size:18px">${fmtMoney(c.total)}</div></div><div class="stat"><div class="l">Залишок</div><div class="v" style="font-size:18px">${fmtMoney(c.due)}</div></div></div></div>`;}).join('');
+}
+function vSet(){
+  const r=ruleFor(db,S.month),own=!!db.rules[S.month];
+  return `<h1>Налаштування оплати</h1>${monthNav()}
+  <div class="card"><div class="mut sm">Правила діють лише для місяця <b>${mLabel(S.month)}</b>${own?'':' (зараз успадковані з попереднього; після збереження стануть окремими)'}. Інші місяці не змінюються.</div>
+  <label>Базова ставка, грн/год</label><input id="r_base" inputmode="decimal" value="${grn(r.base)}">
+  <label>Після скількох годин змінюється ставка</label><input id="r_thr" inputmode="decimal" value="${r.thrH}">
+  <label>Підвищення ставки, грн/год (додається до базової)</label><input id="r_raise" inputmode="decimal" value="${grn(r.raise)}">
+  <label>Годин для премії</label><input id="r_bh" inputmode="decimal" value="${r.bonusH}">
+  <label>Розмір премії, грн</label><input id="r_bonus" inputmode="decimal" value="${grn(r.bonus)}">
+  <label>Тип премії</label><select id="r_rec"><option value="0" ${r.recurring?'':'selected'}>Одноразова</option><option value="1" ${r.recurring?'selected':''}>Повторювана (за кожні N годин)</option></select></div>
+  <button class="btn" onclick="saveRule()">Зберегти для ${mLabel(S.month)}</button>
+  <h2>Дані</h2><button class="btn sec" onclick="backup()">Зберегти резервну копію (JSON)</button>
+  <button class="btn sec" onclick="document.getElementById('rest').click()">Відновити з копії</button><input type="file" id="rest" accept=".json,application/json" hidden onchange="restore(this.files[0])">
+  <div class="mut sm" style="margin-top:12px">Дані зберігаються на цьому пристрої. Робіть резервну копію регулярно, особливо перед очищенням даних браузера.</div>`;
+}
+function saveRule(){
+  const n=x=>parseFloat(String(x).replace(',','.'));
+  const r={base:parseMoney(r_base.value),thrH:n(r_thr.value),raise:parseMoney(r_raise.value),bonusH:n(r_bh.value),bonus:parseMoney(r_bonus.value),recurring:r_rec.value==='1'};
+  if([r.base,r.thrH,r.raise,r.bonusH,r.bonus].some(x=>!isFinite(x)||x<0))return toast('Перевірте значення');
+  db.rules[S.month]=r;save();toast('Правила збережено');render();
+}
+const IC=p=>`<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+const ICONS={home:IC('<path d="M3 11l9-8 9 8M5 10v10h14V10"/>'),cal:IC('<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>'),pay:IC('<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10.5h18"/>'),more:IC('<circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/>')};
+function vMore(){return `<h1>Ще</h1>`+[['stats','Статистика'],['hist','Історія місяців'],['set','Налаштування оплати та резервні копії']].map(([t,l])=>`<div class="card row" onclick="go('${t}')" style="font-size:17px;align-items:center"><span>${l}</span><span class="mut" style="flex:0">›</span></div>`).join('');}
+
+/* ---------- live shift ---------- */
+const fmtClock=s=>Math.floor(s/3600)+':'+pad(Math.floor(s%3600/60))+':'+pad(s%60);
+function liveCalc(){
+  const a=db.active;if(!a)return null;
+  const el=Math.max(0,Math.floor((Date.now()-a.startMs)/1000));
+  const tmp={...db,shifts:[...db.shifts,{id:'__live',date:a.date,start:a.start,end:a.start,note:'',x2:0,sec:el}]};
+  const c=calcMonth(tmp,monthOf(a.date));
+  const me=c.rows.find(r=>r.id==='__live');
+  const today=c.rows.filter(r=>r.date===a.date).reduce((x,r)=>x+r.pay,0);
+  return {el,c,shift:me?me.pay:0,today};
+}
+const bonusTxt=c=>(!c.rule.recurring&&c.bonusDone)?'отримано ✓':fmtDur(c.toBonus);
+function vLive(){
+  const a=db.active;
+  if(!a)return `<button class="btn" style="font-size:19px;padding:20px;margin-bottom:14px" onclick="startShift()">Початок зміни</button>`;
+  const L=liveCalc();
+  return `<div class="card"><span class="pill">Зміна триває · з ${a.start.slice(0,5)}</span>
+  <div class="mut sm" style="margin-top:12px">Заробіток за сьогодні</div>
+  <div id="lv_today" style="font-size:40px;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums">${fmtMoney(L.today)}</div>
+  <div class="grid" style="margin:12px 0">
+   <div class="stat"><div class="l">Час зміни</div><div class="v" id="lv_el">${fmtClock(L.el)}</div></div>
+   <div class="stat"><div class="l">Ця зміна</div><div class="v" id="lv_shift">${fmtMoney(L.shift)}</div></div>
+   <div class="stat"><div class="l">За місяць (з поточною)</div><div class="v" id="lv_month">${fmtMoney(L.c.total)}</div></div>
+   ${L.c.rule.bonusH>0&&L.c.rule.bonus>0?`<div class="stat"><div class="l">До премії</div><div class="v" id="lv_bonus" style="font-size:16px">${bonusTxt(L.c)}</div></div>`:''}
+  </div>
+  <button class="btn" onclick="endShift()">Кінець зміни</button>
+  <button class="btn del" onclick="cancelShift()">Відкинути зміну</button></div>`;
+}
+function updateLive(){
+  if(!db||!db.active)return;
+  const t=document.getElementById('lv_today');if(!t)return;
+  const L=liveCalc();
+  t.textContent=fmtMoney(L.today);
+  document.getElementById('lv_el').textContent=fmtClock(L.el);
+  document.getElementById('lv_shift').textContent=fmtMoney(L.shift);
+  document.getElementById('lv_month').textContent=fmtMoney(L.c.total);
+  const bt=document.getElementById('lv_bonus');if(bt)bt.textContent=bonusTxt(L.c);
+}
+function startShift(){
+  if(db.active)return;
+  const date=todayStr(),m=monthOf(date);
+  if(!db.rules[m])db.rules[m]={...ruleFor(db,m)};
+  db.active={date,start:nowT(),startMs:Date.now()};
+  save();toast('Зміну розпочато');render();
+}
+function endShift(){
+  const a=db.active;if(!a)return;
+  const el=Math.floor((Date.now()-a.startMs)/1000);
+  if(el<1)return toast('Зачекайте секунду');
+  const f={date:a.date,start:a.start,end:nowT(),note:'',x2:0};
+  db.active=null;
+  if(el>=86400){save();S.edit=null;S.form={...f,end:''};S.tab='add';render();toast('Зміна тривала понад добу, вкажіть кінець вручну');return;}
+  if(overlaps(db,f,null)){save();S.edit=null;S.form=f;S.tab='add';render();toast('Перетин з наявною зміною, перевірте час');return;}
+  commitShift(f);
+}
+function cancelShift(){ask('Відкинути поточну зміну без збереження?','Відкинути',()=>{db.active=null;save();render();});}
+
+/* ---------- install hint ---------- */
+let deferredInstall=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;if(db&&(S.tab==='home'||!db.onboarded)&&!S.sheet){const a=document.activeElement;if(!(a&&a.tagName==='INPUT'))render();}});
+function isStandalone(){try{return matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;}catch(e){return false;}}
+function hintHidden(){try{return localStorage.getItem('inst_hide')==='1';}catch(e){return false;}}
+function hideHint(){try{localStorage.setItem('inst_hide','1');}catch(e){}S.hintOff=true;render();}
+function vInstall(){
+  if(isStandalone()||hintHidden()||S.hintOff)return '';
+  const ua=navigator.userAgent||'';
+  const ios=/iPad|iPhone|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1);
+  const android=/Android/.test(ua);
+  if(!ios&&!android&&!deferredInstall)return '';
+  let body;
+  if(deferredInstall)body=`<button class="btn" onclick="doInstall()">Встановити застосунок</button>`;
+  else if(ios)body=`<div class="sm">Відкрийте цю сторінку в Safari, натисніть «Поділитися» (квадрат зі стрілкою вгору), потім «На початковий екран». Без цього iPhone може стерти ваші дані.</div>`;
+  else body=`<div class="sm">У Chrome відкрийте меню (три крапки) і натисніть «Встановити застосунок» або «Додати на головний екран».</div>`;
+  return `<div class="card"><b>Додайте на головний екран</b><div class="mut sm" style="margin:4px 0 10px">Так застосунок працює без інтернету, а дані не зникнуть.</div>${body}<button class="btn del" onclick="hideHint()">Не показувати</button></div>`;
+}
+async function doInstall(){const e=deferredInstall;if(!e)return;deferredInstall=null;e.prompt();try{await e.userChoice;}catch(_){}render();}
+
+/* ---------- onboarding ---------- */
+function vOnboard(){
+  const m=todayStr().slice(0,7);
+  return `<h1>Вітаємо!</h1><div class="mut" style="margin:-6px 0 14px">Вкажіть умови оплати та скільки вже відпрацьовано цього місяця. Усе можна змінити пізніше в налаштуваннях.</div>${vInstall()}
+  <div class="card"><b>Оплата, ${mLabel(m)}</b>
+  <label>Базова ставка, грн/год</label><input id="o_base" inputmode="decimal" placeholder="наприклад 200">
+  <label>Після скількох годин ставка змінюється</label><input id="o_thr" inputmode="decimal" placeholder="наприклад 200, порожньо якщо немає">
+  <label>Підвищення ставки, грн/год</label><input id="o_raise" inputmode="decimal" placeholder="наприклад 10">
+  <label>Годин для премії</label><input id="o_bh" inputmode="decimal" placeholder="наприклад 160, порожньо якщо немає">
+  <label>Розмір премії, грн</label><input id="o_bonus" inputmode="decimal" placeholder="наприклад 1000">
+  <label>Тип премії</label><select id="o_rec"><option value="0">Одноразова</option><option value="1">Повторювана (за кожні N годин)</option></select></div>
+  <div class="card"><b>Уже відпрацьовано цього місяця</b>
+  <div class="row"><div><label>Годин</label><input id="o_h" inputmode="numeric" placeholder="0"></div><div><label>Хвилин</label><input id="o_m" inputmode="numeric" placeholder="0"></div><div><label>Секунд</label><input id="o_s" inputmode="numeric" placeholder="0"></div></div>
+  <label>Уже отримано на картку, грн</label><input id="o_paid" inputmode="decimal" placeholder="0"></div>
+  <button class="btn" onclick="finishOnboard()">Почати</button>`;
+}
+function finishOnboard(){
+  const n=x=>{const v=parseFloat(String(x).replace(',','.'));return isFinite(v)&&v>0?v:0;};
+  const mny=x=>{const v=parseMoney(x);return isFinite(v)&&v>0?v:0;};
+  const base=mny(o_base.value);
+  if(!base)return toast('Вкажіть базову ставку');
+  let thr=n(o_thr.value),raise=mny(o_raise.value);
+  if(!thr||!raise){thr=9999;raise=0;}
+  const bh=n(o_bh.value),bonus=mny(o_bonus.value);
+  const sec=Math.round(n(o_h.value))*3600+Math.round(n(o_m.value))*60+Math.round(n(o_s.value));
+  const paid=mny(o_paid.value);
+  const date=todayStr(),m=monthOf(date);
+  db.rules[m]={base,thrH:thr,raise,bonusH:(bh&&bonus)?bh:0,bonus:(bh&&bonus)?bonus:0,recurring:o_rec.value==='1'};
+  if(sec>0)db.shifts.push({id:uid(),date:m+'-01',start:'00:00:00',end:'00:00:00',sec,opening:true,note:'Відпрацьовано до початку ведення обліку',x2:0});
+  if(paid>0)db.payments.push({id:uid(),date,month:m,amount:paid,note:'Отримано до початку ведення обліку'});
+  db.onboarded=true;save();S.month=m;S.tab='home';render();
+}
+
+/* ---------- export / backup ---------- */
+async function saveFile(name,text){
+  const file=new File([text],name,{type:name.endsWith('.json')?'application/json':'text/csv'});
+  try{
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});return;}
+    const a=document.createElement('a');a.href=URL.createObjectURL(file);a.download=name;document.body.appendChild(a);a.click();
+    setTimeout(()=>{a.remove();URL.revokeObjectURL(a.href);},1000);toast('Файл збережено');
+  }catch(e){
+    if(e&&e.name==='AbortError')return;
+    S.sheet=`<b>Скопіюйте вміст і збережіть у файл ${name}</b><textarea id="cp" style="height:40vh;margin-top:10px" readonly>${esc(text)}</textarea><button class="btn" onclick="navigator.clipboard.writeText(document.getElementById('cp').value).then(()=>toast('Скопійовано'),()=>document.getElementById('cp').select())">Копіювати</button><button class="btn sec" onclick="closeSheet()">Закрити</button>`;render();
+  }
+}
+function exportCsv(all){
+  const ms=all?allMonths():[S.month],q=v=>'"'+String(v).replace(/"/g,'""')+'"',k=v=>grn(v);
+  let o='Місяць;Дата;Початок;Кінець;Тривалість;Секунд;Заробіток, грн;Примітка\n';
+  ms.forEach(m=>calcMonth(db,m).rows.forEach(r=>{o+=[m,r.date,r.start,r.end,fmtDur(r.sec),r.sec,k(r.pay),q(r.note)].join(';')+'\n';}));
+  o+='\nМісяць;Годин;Секунд;За години;Премія;Нараховано;Отримано;Залишок\n';
+  ms.forEach(m=>{const c=calcMonth(db,m);o+=[m,fmtDur(c.sec),c.sec,k(c.hoursPay),k(c.bonus),k(c.total),k(c.paid),k(c.due)].join(';')+'\n';});
+  saveFile('oblik_'+(all?'usi':S.month)+'.csv','\ufeff'+o);
+}
+function backup(){saveFile('oblik_backup_'+todayStr()+'.json',JSON.stringify(db,null,1));}
+function restore(f){if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.shifts||!d.payments||!d.rules)throw 0;ask('Замінити поточні дані копією?','Замінити',()=>{d.onboarded=true;db=d;save();toast('Відновлено');render();});}catch(e){toast('Файл не схожий на копію');}};r.readAsText(f);}
+
+/* ---------- render ---------- */
+function render(){
+  if(db&&!db.onboarded){document.getElementById('app').innerHTML=vOnboard();return;}
+  if(!db){document.getElementById('app').innerHTML='<h1>Облік змін</h1><div class="card mut">'+(S.loadNote||'Завантаження…')+'</div>';return;}
+  const v={home:vHome,cal:vCal,add:vAdd,pay:vPay,stats:vStats,hist:vHist,set:vSet,more:vMore}[S.tab]();
+  const on=t=>S.tab===t||(t==='more'&&['stats','hist','set'].includes(S.tab))?'on':'';
+  document.getElementById('app').innerHTML=v+`<div class="tabs"><div>
+   <button class="${on('home')}" onclick="go('home')"><span>${ICONS.home}</span>Головна</button>
+   <button class="${on('cal')}" onclick="go('cal')"><span>${ICONS.cal}</span>Календар</button>
+   <button class="plus" onclick="openAdd()"><span>＋</span></button>
+   <button class="${on('pay')}" onclick="go('pay')"><span>${ICONS.pay}</span>Виплати</button>
+   <button class="${on('more')}" onclick="go('more')"><span>${ICONS.more}</span>Ще</button></div></div>`
+   +(S.sheet?`<div class="sheet" onclick="if(event.target===this)closeSheet()"><div>${S.sheet}</div></div>`:'');
+}
+setInterval(updateLive,1000);document.addEventListener('visibilitychange',updateLive);
+render();
+initSync();
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script></body></html>
